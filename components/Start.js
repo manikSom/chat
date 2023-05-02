@@ -7,7 +7,6 @@ import {
   View,
   ImageBackground,
   KeyboardAvoidingView,
-  onAuthStateChanged,
 } from "react-native";
 import { getAuth, signInAnonymously } from "firebase/auth";
 import { Alert } from "react-native";

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { KeyboardAvoidingView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, StyleSheet, View } from "react-native";
 import { Bubble, GiftedChat, InputToolbar } from "react-native-gifted-chat";
 import {
     collection,
@@ -9,8 +9,10 @@ import {
     orderBy,
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from "./CustomActions";
+import MapView from "react-native-maps";
 
-const Chat = ({ isConnected, db, route, navigation }) => {
+const Chat = ({ isConnected, db, route, navigation, storage }) => {
     const { name, color, userID } = route.params;
     const [messages, setMessages] = useState([]);
     let unsubMessages;
@@ -97,6 +99,28 @@ const Chat = ({ isConnected, db, route, navigation }) => {
         );
     };
 
+    const renderCustomActions = (props) => {
+        return <CustomActions storage={storage} {...props} />;
+    };
+
+    const renderCustomView = (props) => {
+        const { currentMessage } = props;
+        if (currentMessage.location) {
+            return (
+                <MapView
+                    style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
+                    region={{
+                        latitude: currentMessage.location.latitude,
+                        longitude: currentMessage.location.longitude,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                    }}
+                />
+            );
+        }
+        return null;
+    };
+
     return (
         <View style={styles.container}>
             <GiftedChat
@@ -104,6 +128,8 @@ const Chat = ({ isConnected, db, route, navigation }) => {
                 messages={messages}
                 renderBubble={renderBubble}
                 renderInputToolbar={renderInputToolbar}
+                renderActions={renderCustomActions}
+                renderCustomView={renderCustomView}
                 onSend={(messages) => onSend(messages)}
                 user={{
                     _id: userID,
